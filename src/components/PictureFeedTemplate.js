@@ -17,18 +17,15 @@ const PictureFeedTemplate = () => {
   const setPosts = usePostsUpdate();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (pageNum) => {
       try {
-        const response = await axios.get(
-          "https://s3.ap-northeast-2.amazonaws.com/bucketplace-coding-test/cards/page_1.json"
-        );
-        console.log(response.data);
+        const response = await axios.get(`../cards/page_${pageNum}.json`);
         setPosts(response.data);
       } catch (e) {
         console.log(e);
       }
     };
-    fetchData();
+    fetchData(1);
   }, [setPosts]);
 
   return (
