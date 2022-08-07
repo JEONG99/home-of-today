@@ -1,30 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { useSkrapPostsUpdate, useSkrapPostsValue } from "../lib/posts";
+import palette from "../styles/palette";
+import SkrapButton from "./SkrapButton";
 
 const PictureFeedItemBlock = styled.div`
   background: white;
   margin: 0 10px;
   margin-top: 10px;
   position: relative;
-
-  .strapButton {
-    position: absolute;
-    right: 15px;
-    bottom: 15px;
-    padding: 0;
-    margin: 0;
-    width: 25px;
-    height: 25px;
-    border: none;
-    background: none;
-    cursor: pointer;
-
-    svg {
-      transition: opacity 0.1s;
-    }
-    &:hover svg {
-      opacity: 0.5;
-    }
   }
 `;
 
@@ -42,7 +26,7 @@ const UserInfoBlock = styled.div`
   span {
     font-size: 15px;
     font-weight: 600;
-    color: #424242;
+    color: ${palette.gray[7]};
   }
 `;
 
@@ -65,7 +49,23 @@ const ImageBlock = styled.div`
   }
 `;
 
-const PictureFeedItem = ({ post }) => {
+const PictureFeedItem = ({ post, skrap }) => {
+  const skrapPosts = useSkrapPostsValue();
+  const setSkrapPosts = useSkrapPostsUpdate();
+  const [isSkrap, setIsSkrap] = useState(skrap);
+  const onSkrap = () => {
+    setIsSkrap(!isSkrap);
+    if (!isSkrap) {
+      setSkrapPosts((skrapPosts) => [...skrapPosts, post]);
+      return;
+    }
+    setSkrapPosts((skrapPosts) => skrapPosts.filter((el) => el.id !== post.id));
+  };
+
+  useEffect(() => {
+    localStorage.setItem("skrapPosts", JSON.stringify(skrapPosts));
+  }, [skrapPosts]);
+
   return (
     <PictureFeedItemBlock>
       <UserInfoBlock>
@@ -75,15 +75,7 @@ const PictureFeedItem = ({ post }) => {
       <ImageBlock>
         <img src={post.image_url} alt="사진" />
       </ImageBlock>
-      <button className="strapButton">
-        <svg viewBox="0 0 25 25" width="25" height="25">
-          <path
-            stroke="white"
-            fill="rgba(255,255,255, 0.2)"
-            d="M12.472 17.07a.999.999 0 0 0-.944 0l-7.056 3.811A.999.999 0 0 1 3 19.998V4.502C3 3.672 3.672 3 4.5 3h15c.828 0 1.5.673 1.5 1.502v15.496a1 1 0 0 1-1.472.883l-7.056-3.811z"
-          />
-        </svg>
-      </button>
+      <SkrapButton onSkrap={onSkrap} isSkrap={isSkrap} />
     </PictureFeedItemBlock>
   );
 };

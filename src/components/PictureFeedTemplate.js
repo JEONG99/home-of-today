@@ -1,7 +1,7 @@
-import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { usePostsUpdate } from "../lib/posts";
+import { useSkrapPostsUpdate } from "../lib/posts";
+import AskModal from "./common/AskModal";
 import Header from "./Header";
 import PictureFeedList from "./PictureFeedList";
 
@@ -14,24 +14,24 @@ const PictureFeedTemplateBlock = styled.div`
 `;
 
 const PictureFeedTemplate = () => {
-  const setPosts = usePostsUpdate();
+  const setSkrapPosts = useSkrapPostsUpdate();
+  const [showOnlySkrap, setShowOnlySkrap] = useState(false);
+
+  const changeMode = () => {
+    setShowOnlySkrap(!showOnlySkrap);
+  };
 
   useEffect(() => {
-    const fetchData = async (pageNum) => {
-      try {
-        const response = await axios.get(`../cards/page_${pageNum}.json`);
-        setPosts(response.data);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    fetchData(1);
-  }, [setPosts]);
+    if (localStorage.getItem("skrapPosts")) {
+      setSkrapPosts(JSON.parse(localStorage.getItem("skrapPosts")));
+    }
+  }, [setSkrapPosts]);
 
   return (
     <PictureFeedTemplateBlock>
-      <Header />
-      <PictureFeedList />
+      <AskModal />
+      <Header onClick={changeMode} checked={showOnlySkrap} />
+      <PictureFeedList showOnlySkrap={showOnlySkrap} />
     </PictureFeedTemplateBlock>
   );
 };

@@ -1,12 +1,22 @@
+import React from "react";
 import "./App.css";
 import PictureFeedTemplate from "./components/PictureFeedTemplate";
-import { PostsProvider } from "./lib/posts";
+import { PostsProvider, SkrapPostsProvider } from "./lib/posts";
+
+const AppProvider = ({ constates, children }) =>
+  constates.reduce(
+    (prev, constate) =>
+      React.createElement(constate, {
+        children: prev,
+      }),
+    children
+  );
 
 function App() {
   return (
-    <PostsProvider>
+    <AppProvider constates={[PostsProvider, SkrapPostsProvider]}>
       <PictureFeedTemplate />
-    </PostsProvider>
+    </AppProvider>
   );
 }
 
